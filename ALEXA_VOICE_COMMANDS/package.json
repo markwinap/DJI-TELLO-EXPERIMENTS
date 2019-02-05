@@ -1,0 +1,24 @@
+{
+  "name": "dji-tello-experiments",
+  "version": "1.0.0",
+  "description": "IMPORTANT YOU ALSO REQUIRE THE FOLLOWING REPO INSTALLED https://github.com/markwinap/Tello_Mission_Control_-_UDP_Server.git",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markwinap/DJI-TELLO-EXPERIMENTS.git"
+  },
+  "author": "Marco Martinez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markwinap/DJI-TELLO-EXPERIMENTS/issues"
+  },
+  "homepage": "https://github.com/markwinap/DJI-TELLO-EXPERIMENTS#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "ws": "^6.1.3"
+  },
+  "devDependencies": {}
+}
