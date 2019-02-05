@@ -2,6 +2,8 @@
 
 IMPORTANT YOU ALSO REQUIRE THE FOLLOWING REPO INSTALLED https://github.com/markwinap/Tello_Mission_Control_-_UDP_Server.git
 
+ALSO get your API KEY from https://sinric.com/
+
 ### CLONE REPO
 ```sh
 git clone https://github.com/markwinap/DJI-TELLO-EXPERIMENTS.git

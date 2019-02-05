@@ -31,8 +31,9 @@ const FORWARD = 'CHANGE_ME';
 const BACKWARD = 'CHANGE_ME';
 const LAND_TAKEOFF = 'CHANGE_ME';
 
+let mainInterval = null;//HOLDER FOR INTERVAL
 ws.on('open', function open() {
-   console.log('ALEXA SET DRONE UP 50');
+   console.log("Connected. waiting for commands..");
 });
 ws.on('message', function incoming(data) {
    let cmdObj = JSON.parse(data);
@@ -63,6 +64,10 @@ ws.on('message', function incoming(data) {
             console.log(cmdObj)
    }
    console.log(cmd);
+   clearInterval(mainInterval);
+   send_cmd(cmd);
+});
+function send_cmd(cmd){
     axios({//SEND THE REQUEST TO OUT LOCAL SERVER
         method: 'post',
         url: `http://${host}:${port}/sendCommands`,
@@ -73,5 +78,15 @@ ws.on('message', function incoming(data) {
                 "status": {}
             }
         }
-    }).catch(e=> console.log(e.code));
-});
+    }).catch(e=> console.log(e.code)).then(res => {
+        console.log('SENT')
+        enableInterval();
+    });
+}
+
+function enableInterval() {
+    clearInterval(mainInterval);
+    mainInterval = setInterval(function(){
+        send_cmd(['command']);
+    }, 4000);
+}
