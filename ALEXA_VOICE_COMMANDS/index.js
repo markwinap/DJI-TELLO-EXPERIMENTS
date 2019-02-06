@@ -33,39 +33,40 @@ const LAND_TAKEOFF = 'CHANGE_ME';
 
 let mainInterval = null;//HOLDER FOR INTERVAL
 ws.on('open', function open() {
-   console.log("Connected. waiting for commands..");
+   console.log("ALEXA Set Drone Up 50");
 });
 ws.on('message', function incoming(data) {
-   let cmdObj = JSON.parse(data);
-   let cmd = null;
-   switch(cmdObj.deviceId){
+    let cmdObj = JSON.parse(data);   
+    let temp_val = cmdObj.value == 'ON' ? 50 : cmdObj.value == 'OFF' ? 50 : cmdObj.value * 5;
+    let cmd = null;
+    switch(cmdObj.deviceId){
         case UP:
-            cmd = [`up ${cmdObj.value}`];
+            cmd = [`up ${temp_val}`];
             break;
         case DOWN:
-            cmd = [`down ${cmdObj.value}`];
+            cmd = [`down ${temp_val}`];
             break;
         case LEFT:
-            cmd = [`left ${cmdObj.value}`];
+            cmd = [`left ${temp_val}`];
             break;
         case RIGHT:
-            cmd = [`right ${cmdObj.value}`];
+            cmd = [`right ${temp_val}`];
             break;
         case FORWARD:
-            cmd = [`forward ${cmdObj.value}`];
+            cmd = [`forward ${temp_val}`];
             break;
         case BACKWARD:
-            cmd = [`back ${cmdObj.value}`];
+            cmd = [`back ${temp_val}`];
             break;
         case LAND_TAKEOFF:
             cmd = cmdObj.value == 'ON' ? ['command', 'takeoff'] : ['land'];
             break;
         default:
             console.log(cmdObj)
-   }
-   console.log(cmd);
-   clearInterval(mainInterval);
-   send_cmd(cmd);
+    }
+    console.log(cmd);
+    clearInterval(mainInterval);
+    send_cmd(cmd);
 });
 function send_cmd(cmd){
     axios({//SEND THE REQUEST TO OUT LOCAL SERVER
