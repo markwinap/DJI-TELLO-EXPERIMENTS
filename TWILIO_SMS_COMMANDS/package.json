@@ -1,0 +1,15 @@
+{
+  "name": "twilio_sms_commands",
+  "version": "1.0.0",
+  "description": "DJI Tello Twilio SMS Commands",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marco Martinez (927893)",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.16.4"
+  }
+}
