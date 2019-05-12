@@ -78,7 +78,7 @@ server.on('error', (err) => {
 
 //OTHER FUNCTIONS
 function cleanSMS(str){
-    return str.trim().split(/\s*(?:,|$)\s*/);
+    return str.trim().split(/\s*(?:,|$)\s*/).toLowerCase();
 }
 //UDP FUNCTIONS
 async function startCMD(){
