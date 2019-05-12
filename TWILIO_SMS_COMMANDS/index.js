@@ -1,6 +1,6 @@
 //EXPRESS HTTP SERVER
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require('./node_modules/express');
+const bodyParser = require('./node_modules/body-parser');
 const server_port = 3000;//Express HTTP Server PORT
 //UPP
 const dgram = require('dgram');
@@ -15,15 +15,28 @@ const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const tello_ip = '192.168.10.1';//YOUR TELLO IP
-let commands = {};//OBJECT STATS AND COMMANDS HOLDER
+let commands = {[tello_ip]: {}};//OBJECT STATS AND COMMANDS HOLDER
+
+//COMMANS TO INGNORE IN SMS RESPONSE
+const cmd_ignore = ['mid', 'x', 'y', 'z', 'vgx', 'vgy', 'vgz', 'tof', 'mpry'];//SEE UDP MESSAGE DEFINITIONS IN README FOR ALL COMMANDS
 
 //EXPRESS HTTP SERVER
 app.post('/smsCommands', urlencodedParser, function (req, res) {// SEND COMMANDS TO DRONE
-    commands = null;
-    commands = {[tello_ip]: { cmd_list: cleanSMS(req.body.Body)}};
+    commands[tello_ip] = Object.assign(commands[tello_ip], { cmd_list: cleanSMS(req.body.Body)});
     startCMD();
-    console.log(commands);
-    res.send(req.body);
+    let resp = '';
+    res.setHeader('Content-Type', 'application/xml');
+    if(commands[tello_ip].hasOwnProperty('status')){
+      for(let i in commands[tello_ip]['status']){
+        if(!cmd_ignore.includes(i)){
+          resp += `${i}: ${commands[tello_ip]['status'][i]}\n`;
+        }        
+      }
+    }
+    else{
+      resp = 'Drone Status Not Available';
+    }
+    res.send(MainGrap(BuildXML({Message : {}}, resp)));
 });
 app.listen(server_port);//START EXPRESS SERVER
 
@@ -54,8 +67,8 @@ server.on('error', (err) => {
       //UNCOMNET FOR DEBUG
       //console.log(`${remote.address}:${remote.port} - ${message}`);
       let msg_obj = dataSplit(message.toString());
-      if(commands.hasOwnProperty(remote.address)){
-        commands[remote.address]['status'] = msg_obj;
+      if(commands.hasOwnProperty(tello_ip)){
+        commands[tello_ip]['status'] = msg_obj;
       }
       else{
         commands = Object.assign(commands, {[remote.address]: { status: msg_obj }})
@@ -75,6 +88,17 @@ async function startCMD(){
     }
     return 'OK';
   }
+function dataSplit(str){//Create JSON OBJ from String  "key:value;"
+  let data = {};
+  let arrCMD = str.split(';');  
+  for(let i in arrCMD){
+    let tmp = arrCMD[i].split(':');
+    if(tmp.length > 1){
+      data[tmp[0]] = tmp[1];
+    }
+  }
+  return data;
+}
 //SEND COMMANDS
 function senCMD(tello, command) {//SEND COMMAND TO TELLO OR SPECIAL FUNCTIONS
     let cmd = command.split(' ');
@@ -149,4 +173,16 @@ function nextCMD(tello) {//GET NEXT COMMAND IN LINE
   } else {
     console.log('Drone Not Found');
   }
+}
+//XML Builder
+function MainGrap(XML) {
+  return `<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response>${XML}</Response>`;
+}
+function BuildXML(obj, c){
+  let tbase = '';
+  let pro = Object.getOwnPropertyNames(obj)[0];
+  Object.getOwnPropertyNames(obj[pro]).forEach(function (val) {
+        tbase += ' ' + val + '="'+ obj[pro][val] + '"';
+      });
+return '<' + pro + tbase + '>' + c + '</' + pro + '>';
 }
